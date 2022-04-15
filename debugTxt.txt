@@ -1,0 +1,6 @@
+bleTransmit("printHWCbuffer")
+
+bleTransmit("getSpiffsToBuffer")
+
+bleTransmit("printSch")
+
