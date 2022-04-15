@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="142.97392mm"
+   height="139.19104mm"
+   viewBox="0 0 142.97392 139.19104"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.1 (50ffc5b540, 2022-01-11)"
+   sodipodi:docname="days.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="true"
+     inkscape:zoom="1.2406274"
+     inkscape:cx="209.9744"
+     inkscape:cy="175.31452"
+     inkscape:window-width="1680"
+     inkscape:window-height="986"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     objecttolerance="1"
+     guidetolerance="1"
+     gridtolerance="1">
+    <sodipodi:guide
+       position="-11.88488,110.42587"
+       orientation="0,-1"
+       id="guide25015" />
+    <sodipodi:guide
+       position="24.102336,143.53884"
+       orientation="1,0"
+       id="guide25017" />
+    <sodipodi:guide
+       position="79.481236,55.520171"
+       orientation="1,0"
+       id="guide38387" />
+    <sodipodi:guide
+       position="24.246787,55.520171"
+       orientation="0,-1"
+       id="guide38389" />
+    <inkscape:grid
+       type="xygrid"
+       id="grid3310" />
+  </sodipodi:namedview>
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-16.331527,-15.696401)">
+    <rect
+       style="fill:#439dcb;fill-opacity:1;stroke-width:3.46501"
+       id="rect928"
+       width="55.234451"
+       height="55.234451"
+       x="40.578316"
+       y="99.367271" />
+    <path
+       style="fill:#ff0002;fill-opacity:1;stroke:#000000;stroke-width:0.130709px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 67.837288,153.4949 c -6.19911,-4.18632 -16.554576,-7.01316 -5.47597,-20.03186 6.47673,-7.61094 7.50747,-9.62654 9.02267,-21.07062 8.85822,14.81573 17.46097,30.11109 -3.5467,41.10248 z"
+       id="flame"
+       sodipodi:nodetypes="cscc" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="59.624043"
+       y="108.7128"
+       id="text7023"><tspan
+         sodipodi:role="line"
+         id="tspan7021"
+         style="stroke-width:0.264583"
+         x="59.624043"
+         y="108.7128">ON</tspan></text>
+    <path
+       style="fill:#fff9f7;fill-opacity:1;stroke:none;stroke-width:0.144939px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 82.986161,51.499321 C 96.622569,87.643469 61.543456,89.825073 52.400809,82.216584 65.068378,81.431574 78.270076,74.220689 82.986161,51.499321 Z"
+       id="moon"
+       sodipodi:nodetypes="ccc" />
+    <rect
+       style="fill:#18b7fb;fill-opacity:1;stroke:none;stroke-width:3.46501;stroke-opacity:1"
+       id="daySquare"
+       width="55.234451"
+       height="55.234451"
+       x="104.07099"
+       y="44.418533" />
+    <rect
+       style="fill:#439dcb;fill-opacity:1;stroke-width:3.46501"
+       id="rect11943"
+       width="55.234451"
+       height="55.234451"
+       x="104.07099"
+       y="99.652992" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="123.11671"
+       y="108.99853"
+       id="text11949"><tspan
+         sodipodi:role="line"
+         id="tspan11947"
+         style="stroke-width:0.264583"
+         x="123.11671"
+         y="108.99853">OFF</tspan></text>
+    <ellipse
+       style="fill:#fcfe04;fill-opacity:1;stroke:none;stroke-width:3.46501;stroke-opacity:1"
+       id="sun"
+       cx="130.84006"
+       cy="72.204201"
+       rx="19.429451"
+       ry="17.863678" />
+    <g
+       id="clock">
+      <ellipse
+         style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:3.60339;stroke-opacity:1"
+         id="path24621"
+         cx="30.035559"
+         cy="30.780863"
+         rx="11.902337"
+         ry="13.282767" />
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1.465;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 24.973393,26.675143 4.990444,4.141748 7.190793,-5.130029"
+         id="path25247" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="62.388874"
+       y="30.816891"
+       id="text30157"><tspan
+         sodipodi:role="line"
+         id="tspan30155"
+         style="stroke-width:0.264583"
+         x="62.388874"
+         y="30.816891">01</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="122.61539"
+       y="30.816891"
+       id="text33923"><tspan
+         sodipodi:role="line"
+         id="tspan33921"
+         style="stroke-width:0.264583"
+         x="122.61539"
+         y="30.816891">02</tspan></text>
+    <path
+       style="fill:#67616d;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
+       d="M 40.433863,44.46157 H 95.812764 V 99.367268 H 40.433863 Z"
+       id="nightBlock" />
+    <path
+       style="fill:#439dcb;stroke:#fcfd00;stroke-width:2.165;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       d="m 16.784092,15.676511 141.746878,0.02175 0.53886,47.779534 -142.701921,1.670745 z"
+       id="path3228" />
+  </g>
+</svg>

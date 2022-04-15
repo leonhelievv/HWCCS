@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>add_BLE_coms_play</title>
+    
+    <style id="general">
+  
+        html{
+            background-image: url('rain.png');
+        }
+        #canvasDial{
+            background-color: rgba(200, 200, 200, 0);
+            width: 70%;
+            margin: 1rem auto;
+            display: block;
+        }
+        
+         #feedBack{
+         	position: fixed;;
+            background-color: rgba(200, 200, 200, 0.2);
+            z-index: -1;
+            
+        }
+        
+        #canvasDayWeek{
+            background-color: rgba(200, 200, 200, 0.5);
+            width: 100%;
+            margin: 1rem auto;
+            display: block;
+            background-color: lightseagreen;
+        }
+        
+        #temp {
+  				<!-- position: absolute; -->
+  				left: 10px;
+ 				top: 300px;
+ 				color: white;
+ 				font-weight: 100;				
+			}
+			
+			#dayWeek {
+  				<!-- position: absolute; -->
+  				left: 10px;
+ 				top: 300px;
+ 				color: white;
+ 				font-weight: 100;				
+			}
+			
+			#goHomeBtn {
+  				position: absolute;
+  				left: 40%;
+ 				top: 95%;
+ 				color: red;
+ 				font-weight: 100;				
+			}
+			
+		.scrolling-wrapper {
+  			overflow-x: scroll;
+  			overflow-y: hidden;
+ 			white-space: nowrap;
+    		display: inline-block;		
+ 		 }
+ 		 
+ 		 .offAll {
+  			overflow-x: scroll;
+  			overflow-y: scroll;
+ 			white-space: nowrap;
+    		display: inline-block;		
+ 		 }
+ 		 
+		/* Style the user schedule cards */
+		.schCard {
+  			padding: 2px;
+  			text-align: center;
+  			background-color: steelblue;
+  			height: 2%;
+  			width: 60%
+		}
+		
+	.slider{
+ 	
+ 	width: 10em;
+ 	height: 25px;
+ 	background: lightgoldenrodyellow;
+ 	background-color: lightcoral;
+  	cursor: pointer;
+	}
+	        
+ </style>
+    
+<style id="allOffStyle">
+
+table , th, td {
+	border: 4px solid white;
+}
+
+table {
+	width: 90%
+}
+</style>
+    
+<style id="callOut">
+body {font-family: Arial, Helvetica, sans-serif;}
+
+.callout {
+  position: fixed;
+  bottom: 35px;
+  right: 20px;
+  margin-left: 20px;
+  max-width: 300px;
+}
+
+.callout-header {
+  padding: 25px 15px;
+  background: #555;
+  font-size: 30px;
+  color: white;
+}
+
+.callout-container {
+  padding: 15px;
+  background-color: #ccc;
+  color: black
+}
+
+.closebtn {
+  position: absolute;
+  top: 5px;
+  right: 15px;
+  color: white;
+  font-size: 30px;
+  cursor: pointer;
+}
+
+.closebtn:hover {
+  color: lightgrey;
+  }
+  
+/* Clear floats after the columns */
+.allOffrow: {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Style the counter cards */
+.allOffcard {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2); /* this adds the "card" effect */
+  padding: 16px;
+  text-align: center;
+  background-color: #f1f1f1;
+}
+
+/* Float four columns side by side */
+.allOffcolumn {
+  float: left;
+  width: 50%;
+  padding: 0 10px;
+}
+
+.maskCard {
+  /* Add shadows to create the "card" effect */
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+  transition: 0.3s;
+  background-color: lightblue;
+}
+
+#bleScan {
+   position: absolute;
+   left: 10%;
+   top: 25%;
+   padding: 0px 20px 10px 10px;
+   background: rgba(59, 166, 212,1);
+   border: thin solid rgba(26, 117, 50, 0.6);
+   color: black;
+   background-color: steelblue;
+   font-family: Droid Sans, Arial, Helvetica, sans-serif;
+   font-size: 16px;
+   cursor: pointer;
+   height: 30%
+   }
+   
+   .loader {
+  border: 16px solid #f3f3f3; /* Light grey */
+  border-top: 16px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  animation: spin 2s linear infinite;
+  position: absolute;
+  left: 25%;
+  top: 30%
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.userActColumn {
+	position: absolute;
+	left: 20%;
+	width: 60%;
+	height: 50%;
+	overflow-y: scroll;
+}
+
+.userActCard {
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2); /* this adds the "card" effect */
+  padding: 16px;
+  text-align: center;
+  background-color: steelblue;
+  margin-bottom: 20px
+}
+      	
+</style>
+    
+</head>
+
+<body>
+
+
+<h2 id="playHeader" style="background-color: blue; color: white; text-align: center; display: none;"></h2>
+
+<canvas id="canvasDial" style="display: none;"></canvas>
+
+<!-- user actions cards -->
+<div id="userActions" class="userActColumn"  style="display: none;">
+	<div class="userActCard">
+		<button id="makeSchBtn" style="display: none; margin-bottom:20px; background-color:lightyellow; "></button>
+	</div>
+	<div class="userActCard">
+		<button id="asgnUschWdBtn" style="display: none; margin-bottom:20px; background-color:lightblue; "></button>
+	</div>
+	<div class="userActCard">
+		<button id="asgnUschWendBtn" style="display: none; margin-bottom:20px; background-color:pink; "></button>
+	</div>
+		<div class="userActCard">
+		<button id="offAllBtn" style="display: none; margin-bottom:20px; background-color:gray; ">not at home - off</button>
+	</div>
+	<div class="userActCard">
+		<button id="mySchsBtn" style="display: none; margin-bottom:20px ;background-color: lightseagreen;"> show my schedules</button>
+	</div>
+	<div class="userActCard">
+		<button id="spotCheckDayBtn" style="display: none; margin-bottom:20px; background-color: lightskyblue;">show the schedules for this day</button>
+	</div>
+	<div class="userActCard">
+		<button id="showSchAssigBtn" style="display: none; margin-bottom:20px; background-color: lightcyan;">show the schedules assigned</button>
+	</div>
+	<div class="userActCard">
+		<button id="updateHWCD" style="display: none; margin-bottom:20px; background-color: green;">update thedevice</button>
+	</div>
+	<div class="userActCard">
+		<button id="getDataBtn" style="display: none; margin-bottom:20px; background-color: green;">get the data from the HWCCS</button>
+	</div>	
+	<div class="userActCard">
+		<button id="setClockBtn" style="display: none; margin-bottom:20px; background-color: white;">set the date and time of your HWCCS</button>
+	</div>	
+	<div class="userActCard">
+		<button id="overideBtn" style="display: none; margin-bottom:20px; background-color: red;">overide the current schedule</button>
+	</div>
+	
+	
+</div>
+
+<div id="monthSelect" class="scrolling-wrapper" style="width: 375px; height: 100px; display: none;"></div> 
+  
+<div id="dayWeek" class="scrolling-wrapper" style="width: 375px; height: 100px; display: none;"></div>    
+
+<button id="goHomeBtn" style="display: none;">Go Home</button>
+
+<!-- BLE scan Button -->
+<div id="bleScanArea" style="display: none;"><button id="bleScan" onmousedown ="findHWCS()">   
+	<p style="font-size: 24px"> find my <p/><p style="font-size: 24px">Hot water control system</p> </button>
+</div>
+
+
+<div id="makeDaySchedule" style="display: none;">
+<!-- input the name -->
+<div id="scheduleArea" style="align-content: center; width: 80%; ">
+<h2 id="theSchName" style="background-color: steelblue; color: white;">Your Schedule</h2>
+<input id="inputName" type="text" style="color: blue; margin-bottom: 20px; display: none;">
+<button id="nameSubmit" style="margin-bottom: 20px ; background-color: lightseagreen; display: none;" >Make the schedule</button>
+</div>
+
+<!-- call out box -->
+<div id="callOutBox" class="callout" style="display: none;">
+  <div id="cobH" class="callout-header">advice</div>
+  <span class="closebtn" >&times;</span>
+  <div class="callout-container">
+    <p id="callText" ></p>
+  </div>
+</div>
+
+<!-- 24 hour on/off schedule -->
+<div id="hours24" class="scrolling-wrapper" style="width: 375px; height: 200px; display: none;"></div>
+
+<div id = 'minMaxT' style="display: none; width: 60%">
+<p id = "minTtxt" style="color: lightblue; background-color: rgba(47, 145, 237, 0.2);">minimum temprature C</p>
+<input id = "minTemp"  type="range" min="0" max="40" value="40"  class="slider" >
+<p id = 'maxTtxt' style="color: lightpink; background-color: rgba(247, 17, 17, 0.2)">maximum temprature C</p>
+<input id="maxTemp" type="range" min="20" max="90" value="60" style= "background: orange; margin-bottom: 20px; width: 10em">
+</div>
+
+<button id="schSubmit" style="display: none; margin-bottom: 20px; background-color: lightseagreen;">SUBMIT Schedule</button>
+
+<button id="deleteBtn" style="display: none; background-color: red;">Delete Schedule</button>
+
+</div>
+
+
+<div id="spotCheckDay" style="display: none">
+	<input id="spotCheckInput" type="date" style="background-color: steelblue; margin-bottom: 20px">
+	<div id="masks" style="display: none;">
+		<p style="background-color: white">This day falls in your 'away' days : </p>
+		<div id="maskReason" class="maskCard">
+			<div id="maskContainer"></div>
+		</div>
+	</div>
+</div>
+
+<!-- list of user templates made -->
+<div id="userListSch" class="column" style="display: none; margin-bottom: 40px">
+</div>
+
+<div id="schAndAssignsArea" style="display: none;">
+<table id = 'schAndAssigns'>
+  <tr>
+    <th style="background-color: lightcyan;">Your Schedule</th>
+    <th style="background-color: lightcyan; ">Assigned to</th>   
+  </tr>
+</table>
+</div>
+
+
+<div id="offAllArea" style="display: none;">
+<p style="color: white; font-size: 20px">2022</p>
+<button id="offAlladd" style="margin-bottom: 40px"></button>
+<button id="offAllDel" style="margin-bottom: 40px">this is delete</button>
+
+
+<div id="" class="offAll" style="width: 375px; height: 300px;">
+<table id="offAllTbl">
+    <th style="color: red">my reason</th>
+    <th style="color: red">away from this date</th>
+    <th style="color: green;">return at this date</th>
+  </tr>
+  <tr>
+    <td><div id="awayL1" class="allOffcard"> your label </div></td>
+    <td><div id="start1" class="allOffcard">system off, from this day</div></td>
+    <td><div id="end1" class="allOffcard">system back on, at this day</div></td>
+  </tr>
+
+</table>
+</div> 
+
+</div>
+
+<canvas id="feedBack" width='100' height="80" style="top: 100px; display: none;"></canvas>
+
+<div id = "waitingFor" style="display: none;">
+<div id = "loader" class="loader"></div>
+<p id = "waitFor" class="schCard" style="background-color: seashell;"> What are we waiting for</p>
+</div>
+
+<div id = "setClockArea" style="display: none;">
+<div id = "setClock"></div>
+<p id = "setClockText" class="schCard" style="background-color: seashell; margin-bottom: 20px;"> set the time and date of your hot water control system</p>
+<p><input type="date" id="setCalendar" name="setDate"  style="margin-bottom: 20px;" ></p>
+<p><input type="time" id="setTime" name="setHMS" style="margin-bottom: 20px;"></p>
+<p><button id="setClockSubmit" style="background-color: blue; font-size: 25px; color: white;"> submit </button></p>
+</div>
+
+<div id="P_overide">
+	<div id = "overideArea" style="display: none; margin-left: 15%">
+		<p><canvas id="onOffCanvas" width='100' height="160" style=" margin-left: 10%" ></canvas></p>
+		<p><button id="onOff" style="font-size: 15px; margin-bottom: 20px; color: red" >overide the system to : ON</button></p>
+		<p id="onOffIfo" style="background-color: seashell; margin-bottom: 20px; width: 60%" ></p>
+		<p><input type="date" id="resumeDate"  style="margin-bottom: 20px;"></p>
+		<p><input type="time" id="resumeTime" style="margin-bottom: 20px"></p>
+		<p><button id="onOffSubmit" style="color: white; background-color: green;margin-bottom: 30px";> SUBMIT THIS OVERIDE </button></p>
+		<p><button id="delOveride" style="color: white; background-color: red;"> DELETE THE OVERIDE </button></p>
+	</div>
+
+</div>
+
+<script>
+function globalVars() {
+//vars
+	window.tmpDial = document.getElementById('canvasDial');
+	window.goMschedule = document.getElementById('mScheduleT');
+	window.monthSelect = document.getElementById('canvasDial');
+	window.daysWeek = document.getElementById('dayWeek');
+	window.hours24a = document.getElementById('hours24');
+	window.goHomeBtn1 = document.getElementById('goHomeBtn');
+	window.playHeader1 = document.getElementById('playHeader');
+	window.nameSchedule = document.getElementById('nameSch');
+	window.scheduleArea1 = document.getElementById('scheduleArea');
+	window.makeSchBtn1 = document.getElementById('makeSchBtn');
+	window.asgnUschWdBtn1 = document.getElementById('asgnUschWdBtn');
+	window.asgnUschWendBtn1 = document.getElementById('asgnUschWendBtn');
+	window.mySchsBtn1 = document.getElementById('mySchsBtn');
+	window.feedBack1 = document.getElementById('feedBack')
+	window.minMaxT1 = document.getElementById('minMaxT')
+	window.deleteBtn1 = document.getElementById('deleteBtn')
+	window.schSubmit1 = document.getElementById('schSubmit')
+	window.nameSubmit1 = document.getElementById('nameSubmit')
+	window.theSchName1 = document.getElementById('theSchName')
+	window.inputName1 = document.getElementById('inputName')
+	window.offAllBtn1 = document.getElementById('offAllBtn')
+	window.offAllArea1 = document.getElementById('offAllArea')
+	window.offAlladd1 = document.getElementById('offAlladd')
+	window.offAllTbl1 = document.getElementById('offAllTbl')
+	window.spotCheckDayBtn1 = document.getElementById('spotCheckDayBtn')
+	window.spotCheckDay1 = document.getElementById('spotCheckDay')
+	window.updateHWCD1 = document.getElementById('updateHWCD')
+	
+	window.showSchAssigBtn1 = document.getElementById('showSchAssigBtn')
+	
+	window.schAndAssignsArea1 = document.getElementById('schAndAssignsArea')
+	window.schAndAssigns1 = document.getElementById('schAndAssigns')
+	
+	window.bleScanArea1 = document.getElementById('bleScanArea')
+	window.bleScanBtn1 = document.getElementById('bleScan')
+	window.loader1 = document.getElementById('loader')
+	window.waitingFor1 = document.getElementById('waitingFor')
+	window.waitFor1 = document.getElementById('waitFor')
+	window.userActions1 = document.getElementById('userActions')
+	window.getDataBtn1 = document.getElementById('getDataBtn')
+	window.setClockArea1 = document.getElementById('setClockArea')
+	window.setClockBtn1 = document.getElementById('setClockBtn')
+	window.setClockSubmit1 = document.getElementById('setClockSubmit')
+	window.setCalendar1 = document.getElementById('setCalendar')
+	window.setTime1 = document.getElementById('setTime')
+	window.overideArea1 = document.getElementById('overideArea')
+	window.overideBtn1 = document.getElementById('overideBtn')
+
+	
+//activities
+window.activityId = 'none'
+window.currentCmnd = 'none'
+window.appMode = 'none'
+window.activePlay = 'none'
+}
+globalVars()
+</script>
+
+<!-- include all script files here -->
+<script src="./L_hotWaterCntrl_library.js"></script>
+
+<script src="./thermoDial.js"></script>
+<script src="./thermostatDrawing.js"></script>    
+<script src="./dayOfWeek.js"></script>    
+<script src="./dayWeekDrawings.js"></script>    
+<script src="./construct_24h.js"></script>
+<script src="./day_week_rolodex.js"></script>
+<script src="./this_year_dataBase.js"></script>
+<script src="./month_select.js"></script>
+
+<script src="./Home_Display.js"></script>
+<script src="./Display_text.js"></script>
+<script src="./activity_police.js"></script>
+<script src="./assign_schedule_calendar.js"></script>
+
+<!-- the plays -->
+<script src="./P_make_schedule_template.js"></script>
+<script src="./P_user_defined_schedules.js"></script>
+<script src="./P_edit_user_schedule.js"></script>
+<script src="./P_assign_userSch_to_weekDays.js"></script>
+<script src="./P_assign_sch_to_weekends.js"></script>
+<script src="./P_spot_check_this_day.js"></script>
+<script src="./P_show_sch_and_assigns.js"></script>
+<script src="./P_BLE_coms.js"></script>
+<script src="./P_push_data.js"></script>
+<script src="./P_off_all_these_days.js"></script>
+<script src="./P_get_data.js"></script>
+<script src="./P_BLE_coms.js"></script>
+<script src="./P_set_HWCCS_clock.js"></script>
+<script src="./P_overide_on.js"></script>
+
+<!-- calculations -->
+<script src="./C_sunrise_sunset.js"></script>
+
+<!-- location specifics -->
+<script src="./Location_init.js"></script>
+
+<!-- ble stuff -->
+<script src="./BLE.js"></script>
+
+
+<script>
+//make global variable
+
+//the day menu stuff
+ //initMenu();
+ //makeHour(1,0)
+ //makeHour(2,0)
+ //makeHour(3,1)
+ 
+  
+</script>
+    
+<script>
+
+   const increment = 0.02;
+   const dropStart = -1*increment*20
+   const dropMin = -0.5
+   const dropMax = 0.8;
+   const tempMin = 1;
+   const tempMax = 80;
+   //const dgrC = '&#8451';
+   const dgrC = '\xB0';
+   //alert('9\xB0');
+   var cumulatedIncrement = dropStart;
+   var theDropDrawing
+      
+   canvasDial.width = 600;
+   canvasDial.height = 600;
+   
+   //draw grid           
+   drawGrid(100);
+    
+   //move variables
+   var startX = 0;
+   var startY = 0;
+
+initBLEComs()
+
+    </script>
+</body>
+</html>
