@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>add_BLE_coms_play</title>
+    <title>working_temperature min,max overide</title>
     
     <style id="general">
   
@@ -273,7 +273,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 <button id="goHomeBtn" style="display: none;">Go Home</button>
 
 <!-- BLE scan Button -->
-<div id="bleScanArea" style="display: none;"><button id="bleScan" onmousedown ="findHWCS()">   
+<div id="bleScanArea" style="display: none;"><button id="bleScan" onmousedown = "findHWCS()" >   
 	<p style="font-size: 24px"> find my <p/><p style="font-size: 24px">Hot water control system</p> </button>
 </div>
 
@@ -298,7 +298,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 <!-- 24 hour on/off schedule -->
 <div id="hours24" class="scrolling-wrapper" style="width: 375px; height: 200px; display: none;"></div>
 
-<div id = 'minMaxT' style="display: none; width: 60%">
+<div id = 'minMaxT' style="display: none; width: 70%">
 <p id = "minTtxt" style="color: lightblue; background-color: rgba(47, 145, 237, 0.2);">minimum temprature C</p>
 <input id = "minTemp"  type="range" min="0" max="40" value="40"  class="slider" >
 <p id = 'maxTtxt' style="color: lightpink; background-color: rgba(247, 17, 17, 0.2)">maximum temprature C</p>
@@ -387,7 +387,9 @@ body {font-family: Arial, Helvetica, sans-serif;}
 
 </div>
 
+
 <script>
+
 function globalVars() {
 //vars
 	window.tmpDial = document.getElementById('canvasDial');
@@ -444,6 +446,9 @@ window.activityId = 'none'
 window.currentCmnd = 'none'
 window.appMode = 'none'
 window.activePlay = 'none'
+
+//current state of the HWCCS
+window.HWCCSstate = 'none'
 }
 globalVars()
 </script>
@@ -500,7 +505,6 @@ globalVars()
  //makeHour(2,0)
  //makeHour(3,1)
  
-  
 </script>
     
 <script>

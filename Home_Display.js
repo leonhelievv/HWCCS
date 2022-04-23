@@ -5,6 +5,8 @@ var dialDone = false
 function initHomeDisplay() {
 	activityId = 'home'
 	if (dialDone == false) {
+	//init HWCData[0]
+	HWCData[0] = 0
 	//draw temprature dial
 	displayHWCTemp()
 	dialDone = true
@@ -45,10 +47,8 @@ function initHomeDisplay() {
 	playHeader1.innerHTML = phaseHeaders[0]
 	
 	//get the temprature of the HWC
-	bleTransmit("sendTemp");
-  	setTimeout(getResponse,500);
-  	//set timer to refresh the temprature
-  	setTimeout(updateTmp,2000);
+	updateTmp()
+
 	
 }
 
@@ -78,7 +78,9 @@ function cleanUpHomeDisplay() {
 	userActions1.style.display = 'none'
 	//clear the getRespons timeout - in case this play is still waiting for a respons
 	clearTimeout(getResponse)
-	clearTimeout(updateTmp)
+	clearTimeout(updateTmp,2000)
+	clearTimeout(updateTmp,10000)
+	
 	
 	//this is a change in play
 	if (btn == 'makeSchBtn') {
@@ -138,26 +140,36 @@ function asgnUschWdBtnQ() {
 
 function home_msgHandler(msg) {
 	
-	if (msg.includes('temp')) {
+	if (msg.includes('temp/')) {
 		//extract the temprature
 		tmp = msg.split('/');
 		//update the temprature data 		
 		HWCData[0] = parseInt(tmp[1])
-		//update the temprature
-		updateTemp()
+		//update the GUI temprature
+		updateGUItemp()
+		setTimeout(updateTmp,10000);
  
 	} else if (msg == "sendTemp") {
 		//still waiting for confirmation - wait
 		setTimeout(getResponse,200);
-	}
-		
+	}else if (msg == "in/runHWCCS") {
+		HWCCSstate = "in/runHWCCS"
+		//the device is in run mode - can now request temp
+		//bleTransmit("sendTemp");
+  		//setTimeout(getResponse,500);
+  		//set timer to refresh the temprature
+  		//clearTimeout(updateTmp,2000);
+  		//setTimeout(updateTmp,2000);
+	}		
 }
 
 function updateTmp() {
+	clearTimeout(updateTmp,10000);
+	if (activePlay == 'Home_Display') {
 	//get the temprature of the HWC
 	bleTransmit("sendTemp");
-  	setTimeout(getResponse,500);
-  	setTimeout(updateTmp,10000);
+  	setTimeout(getResponse,500);	
+  }
 }
 
 

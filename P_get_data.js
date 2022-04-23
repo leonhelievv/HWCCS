@@ -1,6 +1,6 @@
 var HWCSdataString = '';
 let previousRespons = 'none';
-var schDone = ''
+var getSchDone = ''
 var assignedDone = ''
 var offAllDone = ''
 var HWCDataDone = ''
@@ -23,19 +23,26 @@ function initGetData() {
   		setTimeout(getResponse,500);
   }else{
   	//it is the second phase of init
-  	setTimeout(doComms,1000);
+  	//setTimeout(doComms,1000);
 	GetSchData()   
   }
 }
 
-function cleanupGetData() {
-	//first build the app data structures, use data from HWCS
-	makeAppDataStructures()
-	playHeader1.style.display = 'none'
-	waitingFor1.style.display = 'none'
-	initGetDataP2 = false
-	bleTransmit("runHWCCS");
-	initHomeDisplay()
+function cleanupGetData(switchPlay) {
+	if (!switchPlay) {
+		//the device is not in RunHWCCS
+		//first build the app data structures, use data from HWCS
+		makeAppDataStructures()
+		playHeader1.style.display = 'none'
+		waitingFor1.style.display = 'none'
+		initGetDataP2 = false
+		bleTransmit("go/runHWCCS");
+		//wait for convermation before passing play to HomeDisplay
+		setTimeout(getResponse,500);
+	}else {
+		//the device is in RunHWCCS
+		initHomeDisplay()
+	}
 }
 
 
@@ -46,8 +53,8 @@ function get_data_msgHandler(readString) {
    	//set the clock for another read later
    	random = Math.floor(Math.random() * 10)+1;
    	setTimeout(getResponse,100 * random);
-   }else if (readString == 'clear') {
-   	//the read string is "clear" - HWCS has not yet sent the next data segment
+   }else if (readString == 'subSetIn') {
+   	//the read string is "subSetIn" - HWCS has not yet sent the next data segment
    	//set the clock for another read later
    	random = Math.floor(Math.random() * 10)+1;
    	setTimeout(getResponse,100 * random);
@@ -64,9 +71,27 @@ function get_data_msgHandler(readString) {
    	setTimeout(getResponse,100 * random);
    }else if (readString == 'none') {
    	//??? what to do if readString is none
-   	console.log('the read string is '+readString)
+   	console.log('the read string is '+readString)  	
+   	waitRespons = false
+		//the requested command is fullfilled - no data			
+		clearInterval(rdResponsInerval);				
+		//no longer bussy receiving data
+		busyReceivingData = false;
+   	//allow some time before the resolve - avoid another immediate bleTransmit
+   	setTimeout(doResolve("no_data"),1000);
    	
-   	
+   }else if (readString == 'go/runHWCCS') {
+   	//still waiting for device to confirm switch to play RunHWCCS
+   	console.log('still waiting for device to confirm switch to play RunHWCCS '+readString)  	
+   	setTimeout(getResponse,100 * random);  	
+   }else if (readString == 'in/runHWCCS') {
+   	//the device is in RunHWCCS - switch play to Home_Display
+   	console.log('the device is in RunHWCCS - switch play to Home_Display '+readString)  	
+   	cleanupGetData(true) 	
+   }else if (readString == 'sendTemp') {
+   	//this is an ERROR - should have been stopped in HomeCleanup
+   	console.log('this is an ERROR - should have been stopped '+readString)  	
+   		
    }else{
    	//it is a new segment of data to be handled
    	
@@ -80,7 +105,7 @@ function get_data_msgHandler(readString) {
    	var cln1i = readString.indexOf(':',fs1i+1);
    	
    	var dataType = readString.substring(0,fs1i);
-   	if (dataType == "sch" || dataType == "asgn" || dataType == "offAll" || dataType == "HWCInfo" ) {
+   	if (dataType == "sch" || dataType == "asgn" || dataType == "offAll" || dataType == "HWCInfo") {
    		//it is a valid data type
    		var payLoad = readString.substring(fs2i+1);
     		var nOfn = readString.substring(fs1i+1,fs2i);
@@ -96,7 +121,7 @@ function get_data_msgHandler(readString) {
 				//the full subset of data was received
 				//set the characteristic to "cleared"
 				//appCmndToHWCS('cleared')
-				bleTransmit("clear");
+				bleTransmit("allIn");
 				awaitRespons = false
 				//the requested command is fullfilled			
 				clearInterval(rdResponsInerval);				
@@ -106,7 +131,7 @@ function get_data_msgHandler(readString) {
 				
 				//allow some time before the resolve - avoid another immediate bleTransmit
 				console.log('allow some time before the resolve - avoid another immediate bleTransmit')
-				setTimeout(doResolve,1000);
+				setTimeout(doResolve("done"),1000);
 							
     		}else if (nof == '1'){
     			//it is the first
@@ -114,14 +139,14 @@ function get_data_msgHandler(readString) {
     			//there are more to come - set the clock to read again later
     			setTimeout(getResponse,500);
     			//respond with clear
-    			bleTransmit("clear");
+    			bleTransmit("subSetIn");
     		}else {
     			//it is between first and last
     			HWCSdataString = HWCSdataString+payLoad
     			//there are more to come - set the clock to read again later
     			setTimeout(getResponse,500);
     			//respond with clear
-    			bleTransmit("clear");
+    			bleTransmit("subSetIn");
     		}   	   	 
      		responsCheckFlag = false;
       	awaitRespons = false;	  
@@ -129,22 +154,26 @@ function get_data_msgHandler(readString) {
 	}
 }
 
-function doResolve() {
+function doResolve(detail) {
 	//should i make the transmitter free here ?????
 	txMitterFree = true;			
 	//which resolve to call
 	if (currentCmnd == 'sendDatasch') {
 		//the resolve is for sch
-		schDone("The sch data from HWCS is now done !")
+		//schDone("The sch data from HWCS is now done !")
+		schDone("sch_get/"+detail)
 	}else if (currentCmnd == 'sendDataasgn') {
 		//the resolve is for assigned
-		assignedDone("The assingned data from HWCS is now done !")
+		//assignedDone("The assingned data from HWCS is now done !")
+		assignedDone("asgn_get/+detail")
 	}else if (currentCmnd == 'sendDataoffAll') {
 		//the resolve is for offAll's
-		offAllDone("The offAll data from HWCS is now done !")
+		//offAllDone("The offAll data from HWCS is now done !")
+		offAllDone("offAll_get/"+detail)
 	}else if (currentCmnd == 'sendDataHWCInfo') {
 		//the resolve is for sendHWCInfo
-		HWCDataDone("The HWC data from HWCS is now done !")
+		//HWCDataDone("The HWC data from HWCS is now done !")
+		HWCDataDone("HWCCSInfo_get/"+detail)
 	}
 	currentCmnd = 'none'
 }
@@ -160,7 +189,8 @@ async function  GetSchData() {
   		function(value) { 
   			console.log("get sch data done"+value)
   			//GetAssignedData()
-  			schDone = 'done'
+  			getSchDone = 'done'
+  			setTimeout(doComms,1000);
   			},
   		function(error) { console.log("get sch data ERROR") }
 	);
@@ -184,8 +214,9 @@ async function  GetAssignedData() {
   			console.log("get assigned data done"+value)
   			//GetOffAllData()
   			assignedDone = 'done'
+  			setTimeout(doComms,1000);
   			},
-  		function(error) { console.log("get sch data ERROR") }
+  		function(error) { console.log("get asgn data ERROR") }
 	);
  	 	
   //console.log('the task get assigned data is complete : '+await myPromise2) ;
@@ -209,8 +240,9 @@ async function  GetOffAllData() {
   			console.log("get offAll data done"+value)
   			//cleanupBLEComs()
   			offAllDone = 'done'
+  			setTimeout(doComms,1000);
   			},
-  		function(error) { console.log("get sch data ERROR") }
+  		function(error) { console.log("get offAll data ERROR") }
 	);
 	return result
 }
@@ -227,52 +259,48 @@ async function  GetHWCData() {
  	
  	 	HWCDataHere.then(
   		function(value) { 
-  			console.log("get HWC data done"+value)
+  			console.log("GetHWCData done result is, "+value)
   			HWCDataDone = 'done'
+  			setTimeout(doComms,1000);
   			},
   		function(error) { console.log("get HWC data ERROR") }
 	);
 	return result
 }
 
-
-//function getAllData() {
-//	setTimeout(doComms,1000);
-//	GetSchData()   
-// }
  
 function doComms() {
-	if (schDone == 'done') {
+	if (getSchDone == 'done') {
 		//the sch data is in
 		schDataFromHWCS = HWCSdataString
 		HWCSdataString = ''
-		schDone = ''
-		random = Math.floor(Math.random() * 10)+1;
-		setTimeout(doComms,100 * random);
+		getSchDone = ''
+		//random = Math.floor(Math.random() * 10)+1;
+		//setTimeout(doComms,100 * random);
 		GetAssignedData()
 	}else if (assignedDone == 'done') {
 		//the assigned data is in
 		assignedDataFromHWCS = HWCSdataString
 		HWCSdataString = ''
 		assignedDone = ''
-		random = Math.floor(Math.random() * 10)+1;
-		setTimeout(doComms,100 * random);
+		//random = Math.floor(Math.random() * 10)+1;
+		//setTimeout(doComms,100 * random);
 		GetOffAllData()
 	}else if (offAllDone == 'done') {
 		//the offAll data is in
 		offAllDataFromHWCS = HWCSdataString
 		HWCSdataString = ''
 		offAllDone = ''
-		random = Math.floor(Math.random() * 10)+1;
-		setTimeout(doComms,100 * random);
+		//random = Math.floor(Math.random() * 10)+1;
+		//setTimeout(doComms,100 * random);
 		GetHWCData()	
 	}else if (HWCDataDone == 'done') {
-		//the offAll data is in
-		HWCDataFromHWCS = HWCSdataString
+		//the HWCCS info is in
+		HWCSDataFromHWCS = HWCSdataString
 		HWCSdataString = ''
 		HWCDataDone = ''
 		//cleanupBLEComs()
-		cleanupGetData()
+		cleanupGetData(false)
 	}else {
 		//still waitng for data
 		setTimeout(doComms,1000);

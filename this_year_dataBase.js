@@ -84,6 +84,7 @@ var schDataFromHWCS = ''
 var assignedDataFromHWCS = ''
 var offAllDataFromHWCS = ''
 var HWCDataFromHWCS = ''
+var schTmpDataFromHWCS = ''
 
 
 function makeAppDataStructures() {
@@ -212,6 +213,17 @@ function makeAppDataStructures() {
 	for (i = 0 ; i < noHWCInfo ; i++) {
 		HWCData[i] = theData[i]
 	}
+	
+	//--------------schTmp---------------
+	//the sch tempratures are already done in sch
+	
+	//makeAppDataStructures - data comes from HWCCS - put this data into system
+	schTmp = []
+	//what does the string look like ??
+	//1:6/Jesus/22,77;2:6/my Lord/0,0;3:6/the Christ of God/0,0;4:6/none/0,0;5:6/none/0,0;6:6/none/0,0;
+	
+	//write the temperature pairs into the apropriate schedule userTemplates[i][2][0] and [1]
+	//??????
 
 }
 

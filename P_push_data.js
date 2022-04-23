@@ -1,5 +1,7 @@
-function initPushData(deviceInPush) {
-	if (deviceInPush == false) {
+inPushInitP2 = false
+
+function initPushData() {
+	if (inPushInitP2 == false) {
 	activePlay = 'P_push_data'
 	playHeader1.innerHTML = 'Please wait !, sending user settings to the HWCCS'
 	//show the loading spinner while waiting
@@ -14,7 +16,7 @@ function initPushData(deviceInPush) {
 	//set appMode to PushData
 	appMode = 'waitPushData'
 	
-	//put device in push mode
+	//request to HWCCS to go to pushData
 	bleTransmit("pushData");
   	setTimeout(getResponse,500);
   	
@@ -23,18 +25,22 @@ function initPushData(deviceInPush) {
 	//prepare the data for sending
 	prepareData();
 	//start the push process
+	inPushInitP2 = false
 	HWCCSclear = false
 	pushDataState[0] = 'none'
 	pushDataState[1] = 0
-	sendHWCData()
+	//sendHWCData()
+	//launche the pushDataLoop
+   //setTimeout(pushDataLoop,500);
+   doDataPush()
 	}
 
 }
 
 function cleanUpPushData() {
 	waitingFor1.style.display = 'none'
-	bleTransmit("deployPushData");
-	bleTransmit("runHWCCS");
+	//bleTransmit("deployPushData");
+	//bleTransmit("runHWCCS");
 	initHomeDisplay()
 
 }
@@ -44,6 +50,7 @@ function prepareData(){
 	schToHWCD = []
 	asgnToHWCD = []
 	offAllToHWCD = []
+	schTmpToHWCD = []
 
 	const noSch = userTemplates.length
 	//const noValp = userTemplates[0][1].length
@@ -110,7 +117,7 @@ function prepareData(){
 		//push into array the segments
 		if (asgnSl-iN+1*36 < 36) {
 			//the last segment is shorter that 36		
-			asgnToHWCD.push(schString.substring(from))
+			asgnToHWCD.push(asgnString.substring(from))
 		}else{
 			asgnToHWCD.push(asgnString.substring(from,from+36))
 			from = from + 36
@@ -155,11 +162,42 @@ function prepareData(){
 		offAllToHWCD[i] = st
 	}
 	
+		//string the schTmp
+	var schTmpString = ""
+	//const noSch = userTemplates.length
+	
+	for (i = 0; i < noSch; i++) {
+		var theName = userTemplates[i][0]
+		var v1 = userTemplates[i][2]	
+		var schTmpString = schTmpString+(i+1)+":"+noSch+"/"+theName+"/"+v1+"|"		
+	}
+	console.log('the full schTmp string is '+schTmpString)
+	
+	//brake up schTmp string in 36 charater segments
+	const schTmpSl = Math.ceil(schTmpString.length/36)  
+	var from = 0
+	for (iN = 0; iN < schTmpSl; iN++) {	
+		//push into array the segments
+		if (schTmpSl-iN+1*36 < 36) {
+			//the last segment is shorter that 36		
+			schTmpToHWCD.push(schTmpString.substring(from))
+		}else{
+			schTmpToHWCD.push(schTmpString.substring(from,from+36))
+			from = from + 36
+		}
+	}
+	//add the data pack count
+	var aL = schTmpToHWCD.length
+	for (i = 0; i < aL; i++) {
+		var st = "schTmp/"+(i+1)+':'+aL+'/'+schTmpToHWCD[i]
+		schTmpToHWCD[i] = st
+	}
+
 }
 
 function sendHWCData() {	
 	//initiate comms by sending msg to get HWCCSclear
-	bleTransmit('updateUd')
+	//bleTransmit('updateUd')
 	//launche the pushDataLoop
    setTimeout(pushDataLoop,100);
 }
@@ -180,6 +218,7 @@ function doDataPush() {
 		const schL = schToHWCD.length
 		const asgnL = asgnToHWCD.length
 		const offAllL = offAllToHWCD.length
+		const schTmpL = schTmpToHWCD.length
 	
 		if (pushDataState[0] == 'none') {
 			//it is the start of push data to HWCCS
@@ -239,13 +278,29 @@ function doDataPush() {
 				setTimeout(pushDataLoop,500);
 			}else {
 				//all segments has been sent
+				pushDataState[0] = 'schTmp'
+				pushDataState[1] = 0
+				setTimeout(pushDataLoop,500);				
+			}
+		}else if (pushDataState[0] == 'schTmp'){
+			waitFor1.innerHTML = 'Sending schTmp to HWCCS'
+			if (pushDataState[1] < schTmpL) {
+				//all segments of data from asgn array has not been sent
+				dataSegm = schTmpToHWCD[pushDataState[1]];
+				//HWCCSclear = false;			
+				bleTransmit(dataSegm)
+				pushDataState[1] = pushDataState[1]+1
+				//more is expected
+				setTimeout(pushDataLoop,500);
+			}else {
+				//all segments has been sent
 				pushDataState[0] = 'complete'
 				pushDataState[1] = 0
 				//ste appMode to normal
 				appMode = 'normal'
 				//send end of push data
-				//bleTransmit('endPushData')
-				cleanUpPushData()		
+				bleTransmit('pushDone')
+				setTimeout(getResponse,1000);					
 			}
 	}
 		
@@ -262,8 +317,6 @@ function doDataPush() {
 		}
 	}
 }
-
-
 
 
 function sendHWCData() {	
@@ -278,99 +331,6 @@ function pushDataLoop() {
 	characteristicCache.readValue();
 }
 
-function doDataPush() {
-	
-	if (HWCCSclear == true || HWCCSclear == false) {
-		//the charateristic is HWCCSclear
-		
-		//error quard back to 0
-		pushDataState[3] = 0
-		//get lengths
-		const schL = schToHWCD.length
-		const asgnL = asgnToHWCD.length
-		const offAllL = offAllToHWCD.length
-	
-		if (pushDataState[0] == 'none') {
-			//it is the start of push data to HWCCS
-			pushDataState[0] = 'sch'
-			pushDataState[1] = 0
-			//send the first segment
-			dataSegm = schToHWCD[pushDataState[1]]
-			//HWCCSclear = false;
-			bleTransmit(dataSegm)
-			pushDataState[1] = pushDataState[1]+1
-			//more is expected
-			setTimeout(pushDataLoop,500);
-		
-		}else if (pushDataState[0] == 'sch') {
-			if (pushDataState[1] < schL) {
-				//all segments of data from sch array has not been sent
-				dataSegm = schToHWCD[pushDataState[1]]
-				//HWCCSclear = false;
-				bleTransmit(dataSegm)
-				pushDataState[1] = pushDataState[1]+1
-				//more is expected
-				setTimeout(pushDataLoop,500);
-			}else {
-				//all segments has been sent
-				pushDataState[0] = 'asgn'
-				pushDataState[1] = 0
-				setTimeout(pushDataLoop,500);
-			}
-		
-		}else if (pushDataState[0] == 'asgn'){
-			waitFor1.innerHTML = 'Sending list of assigned sch to HWCCS'
-			if (pushDataState[1] < asgnL) {
-				//all segments of data from asgn array has not been sent
-				dataSegm = asgnToHWCD[pushDataState[1]]
-				//HWCCSclear = false;
-				bleTransmit(dataSegm)
-				pushDataState[1] = pushDataState[1]+1
-				//more is expected
-				setTimeout(pushDataLoop,500);
-			}else {
-				//all segments has been sent
-				pushDataState[0] = 'offAll'
-				pushDataState[1] = 0
-				setTimeout(pushDataLoop,500);
-			}
-	
-		}else if (pushDataState[0] == 'offAll'){
-			waitFor1.innerHTML = 'Sending away days to HWCCS'
-			if (pushDataState[1] < offAllL) {
-				//all segments of data from asgn array has not been sent
-				dataSegm = offAllToHWCD[pushDataState[1]];
-				//HWCCSclear = false;
-			
-				bleTransmit(dataSegm)
-				pushDataState[1] = pushDataState[1]+1
-				//more is expected
-				setTimeout(pushDataLoop,500);
-			}else {
-				//all segments has been sent
-				pushDataState[0] = 'complete'
-				pushDataState[1] = 0
-				//ste appMode to normal
-				appMode = 'normal'
-				//send end of push data
-				//bleTransmit('endPushData')
-				cleanUpPushData()		
-			}
-	}
-		
-	}else {
-		//the response from HWCCS is not clear
-		//increment counter as guard - no forever loop
-		pushDataState[2] = pushDataState[2]+1
-		if (pushDataState[2] > 10) {
-			pushDataState[3] = 'Error wait for HWCCSclear'
-			//alert user - do some thing
-		}else {
-			//wait some more
-			setTimeout(pushDataLoop,500);
-		}
-	}
-}
 
 function push_data_msgHandler(msg) {
 	
@@ -382,10 +342,23 @@ function push_data_msgHandler(msg) {
 	} else if (msg == "inPushData") {
 		//it is a confirm that device is in pushMode
 		//continue init push data
-		initPushData(true)
+		if (inPushInitP2 == false) {
+			//the HWCCS is now in Push_data continue with Send_data
+			inPushInitP2 = true
+			initPushData()
+		}
 	}else if (msg == "pushData") {
 		//still waiting for confirmation - wait
 		setTimeout(getResponse,200);
+	}else if (msg == "pushDone") {
+		//still waiting for confirmation - wait
+		setTimeout(getResponse,200);
+	}else if (msg == "pushExit") {
+		//exit
+		cleanUpPushData()
+	}else if (msg == "in/runHWCCS") {
+		//exit
+		cleanUpPushData()
 	}else {
 		//it could be a data segment
 		doDataPush()	

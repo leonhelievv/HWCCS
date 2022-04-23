@@ -26,7 +26,7 @@ function cleanupBLEComs() {
 	initGetData()
 }
 
-async function findHWCS() {
+async function findHWCS_original() {
 	console.log('find my Hot water control system touch start event :'+event.currentTarget.id)
   try {
     console.log('Requesting any Bluetooth device...');
@@ -40,3 +40,23 @@ async function findHWCS() {
     console.log('Argh! ' + error);
   }
 }
+
+
+ async function findHWCS() {
+ 	theEvent = event
+ 	device = await navigator.bluetooth.requestDevice({
+        acceptAllDevices: true
+     });
+     window.HWCCS_Server = await device.gatt.connect(service_uuid);
+     service = await  HWCCS_Server.getPrimaryService(service_uuid);
+     characteristic = await service.getCharacteristic(characteristic_uuid_RX);
+     console.log('---------- at findHWCS ------');
+     console.log('the requested device name is ' + device.name);
+     //connect to the HWCCS
+     //BLE_setup()
+     let HWCCSConnected = await connectDeviceAndCacheCharacteristic(device);
+     console.log('is the HWCCS connected ? '+HWCCSConnected)
+     //connected do cleanup
+     cleanupBLEComs()
+ }
+

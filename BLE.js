@@ -63,23 +63,6 @@ function disconnect() {
   }
 }
 
-function appCmndToHWCS_old(appCmnd) {
-	if (txMitterFree == true) {
-		//not busy sending a cmnd
-		appCmndToHWCSFlag = true;
-		newAppCmnd = appCmnd;
-		if (awaitRespons == true) {
-			//some play is waiting for a response
-			setTimeout(getResponse,100);
-		}
-		bleTransmit(appCmnd);
-		newAppCmnd = 'none';
-	}else {
-		//busy sending cmnd
-		console.log('Error still busy sending a cmnd !!!! ');
-	}
-};
-
 var busyReceivingData = false;
 
 function getHWCSData(section) {
@@ -150,20 +133,20 @@ function resultFromRead(event) {
 	}
 };
 
-function bleTransmit(data) {
+function bleTransmit_original(toSend) {
 	result = "done"
 	//test if HWCS is and if connected
 	if (deviceCache) {
   	//there is a HWCS
    	if (deviceCache.gatt.connected) {
     		//the HWCS is connected
-      	let buffer = new ArrayBuffer(data.length);
+      	let buffer = new ArrayBuffer(toSend.length);
       	let dataView = new DataView(buffer);
-      	for (var i = 0; i <data.length; i++) {
-        		dataView.setUint8( i, data.charAt(i).charCodeAt() );
+      	for (var i = 0; i <toSend.length; i++) {
+        		dataView.setUint8( i, toSend.charAt(i).charCodeAt() );
       	}
 			if (txMitterFree == true){
-      		console.log('accessing the device to send: '+data);
+      		console.log('accessing the device to send: '+toSend);
       		txMitterFree = false;
       		//awaitTxResolve = true;
       		//return characteristicCache.writeValue(buffer)//.then(function() {
@@ -173,7 +156,7 @@ function bleTransmit(data) {
 				}).catch(error => {
 					console.log("characteristicCache.writeValue - ERROR  "+error)
 					//NetworkError: GATT operation already in progress.
-					result = "error/GATTBusy"
+					result = "error/GATTBusy"					
 				})
 			}else {
 				console.log('error txMitter is not free');
@@ -192,7 +175,51 @@ function bleTransmit(data) {
    return result
  };
  
- 
+
+
+function bleTransmit(toSend) {
+	result = "done"
+	//test if HWCS is and if connected
+	if (HWCCS_Server) {
+  	//there is a HWCS
+   	if (HWCCS_Server.device.gatt.connected) {
+    		//the HWCS is connected
+      	let buffer = new ArrayBuffer(toSend.length);
+      	let dataView = new DataView(buffer);
+      	for (var i = 0; i <toSend.length; i++) {
+        		dataView.setUint8( i, toSend.charAt(i).charCodeAt() );
+      	}
+			if (txMitterFree == true){
+      		console.log('accessing the device to send: '+toSend);
+      		txMitterFree = false;
+      		//awaitTxResolve = true;
+      		//return characteristicCache.writeValue(buffer)//.then(function() {
+      		characteristicCache.writeValue(buffer).then(function() {
+  					console.log("after done make transmitter flag free true");
+  					txMitterFree = true;		
+				}).catch(error => {
+					console.log("characteristicCache.writeValue - ERROR  "+error)
+					//NetworkError: GATT operation already in progress.
+					result = "error/GATTBusy"					
+				})
+			}else {
+				console.log('error txMitter is not free');
+				result = "error/txMitterNotFree"
+			}
+      }else{
+      	//the HWCS is not connected
+      	console.log('the HWCS is not connected');
+      	result = "error/HWCCSnotConnected"
+      }
+   }else{
+   	console.log('cant send - no HWCS')
+   	result = "error/noDevice"
+   }
+   
+   return result
+ };
+
+
 		
 async function onWatchAdvertisementsButtonClick1() {
   try {

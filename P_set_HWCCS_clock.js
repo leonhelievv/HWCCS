@@ -28,9 +28,9 @@ function pushClock() {
 	time = setTime1.value
 	bleTransmit('setClk/'+date+'|'+time)
 	console.log('the date and time pushed to HWCCS is '+date+'|'+time)
-	//test if push was good
+	//wait confirmation setClock was done
+	setTimeout(getResponse,1000);
 	
-	cleanupSetClock()
 
 }
 
@@ -59,6 +59,9 @@ function setClock_msgHandler(msg) {
 	}else if (msg == "sendClock") {
 		//still waiting for confirmation - wait
 		setTimeout(getResponse,200);
+	}else if (msg == "setClkDone") {
+		//pass play to Home_display
+		cleanupSetClock()
 	}
 		
 }

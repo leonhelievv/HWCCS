@@ -310,12 +310,14 @@ function displayHWCTemp() {
 	const out_max = 1.4
 	
 	const increment = mapTemp(num,in_min,in_max,out_min,out_max)
-	setTempDial(increment)
+	//setTempDial(increment)
+	//setTempDial(0)
+	updateGUItemp()
 	
 }
 
 
-function updateTemp() {
+function updateGUItemp() {
 	
 	//------   draw the face of the thermostat
 	//drawThermostat(face);

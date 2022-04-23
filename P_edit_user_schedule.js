@@ -57,7 +57,16 @@ function initEditUserSch(userSch) {
  	
  	//add event listener for editing the name of the sch
  	theSchName1.addEventListener('touchstart',editSchName)
-	
+ 	
+ 	//update theGUI with the Temprature pair
+ 	//get minimum amd max
+ 	tmpMin = userTemplates[schUnderEdit][2][0]
+ 	tmpMax = userTemplates[schUnderEdit][2][1]
+	minTtxt1.innerHTML = 'your minimum temprature is : '+tmpMin
+	maxTtxt1.innerHTML = 'your maximum temprature is : '+tmpMax
+	//change the minimum slider position
+	document.getElementById('minTemp').value = tmpMin
+	document.getElementById('maxTemp').value = tmpMax
 }
 
 
@@ -337,7 +346,7 @@ function editMinMax() {
 	if (mMe == 'minTemp') {
 		//minimum was changed - change GUI text with value
 		minTtxt1.innerHTML = 'your minimum temprature is : '+v
-		//update the userSch
+		//update the temprature min
 		userTemplates[schUnderEdit][2][0] = parseInt(document.getElementById('minTemp').value)
 	
 	}else if (mMe == 'maxTemp') {
