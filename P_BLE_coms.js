@@ -44,7 +44,6 @@ async function findHWCS_original() {
 
  async function findHWCS() {
  	theEvent = event
- 	debug1 = document.getElementById('debug')
  	device = await navigator.bluetooth.requestDevice({
         acceptAllDevices: true
      });
