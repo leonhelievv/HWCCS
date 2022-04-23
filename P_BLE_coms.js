@@ -5,6 +5,7 @@ var HWCSData = ''
 
 function initBLEComs() {
 	activePlay = 'P_BLE_coms'
+	debug1.innerHTML = ' ###  initBLEComs  ###'
 	//fill the heading
 	playHeader1.innerHTML = 'establish communication with hot water control system'
 	playHeader1.style.display = 'block'	
