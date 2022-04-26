@@ -1,4 +1,10 @@
 //BLE comms play - only the BLE connection stuff - code is in BLE.js
+
+/*
+this version App_HWCCS_debug_bluetooth_undefined_fail
+works when served from GITHUBB - not from blueFish or 200OK server
+
+*/
 var rdResponsInerval
 var HWCSData = ''
 
@@ -45,6 +51,7 @@ async function findHWCS_original() {
 
  async function findHWCS() {
  	theEvent = event
+ 	 try {
  	debug1.innerHTML = '---------- at findHWCS ------'
  	device = await navigator.bluetooth.requestDevice({acceptAllDevices: true });
  	debug1.innerHTML = '------await navigator.bluetooth.requestDevice-----'
@@ -64,7 +71,11 @@ async function findHWCS_original() {
    
    console.log('is the HWCCS connected ? '+HWCCSConnected)
    debug1.innerHTML = 'connected to  '+HWCCSConnected
-   //connected do cleanup
+     } catch(error) {
+    console.log('' + error);
+    debug2.innerHTML = 'The ERROR detail is >>> >>> '+error
+  }
+  	//connected do cleanup
    cleanupBLEComs()
+ 
  }
-
