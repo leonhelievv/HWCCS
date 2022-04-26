@@ -48,18 +48,25 @@ async function findHWCS_original() {
   }
 }
 
-
+ 
  async function findHWCS() {
+ 	
  	theEvent = event
- 	 try {
  	debug1.innerHTML = '---------- at findHWCS ------'
- 	device = await navigator.bluetooth.requestDevice({acceptAllDevices: true });
+ 	//device = await navigator.bluetooth.requestDevice({acceptAllDevices: true });
+ 	
+ 	device = await navigator.bluetooth.requestDevice({
+  		filters: [ {services: [service_uuid]} ],
+  		optionalServices: [service_uuid]
+	});
+ 	
  	debug1.innerHTML = '------await navigator.bluetooth.requestDevice-----'
-   window.HWCCS_Server = await device.gatt.connect(service_uuid);
+   HWCCS_Server = await device.gatt.connect(service_uuid);
    debug1.innerHTML = '-------await device.gatt.connect------'
    service = await  HWCCS_Server.getPrimaryService(service_uuid);
    debug1.innerHTML = '----------await  HWCCS_Server.getPrimaryService------'
    characteristic = await service.getCharacteristic(characteristic_uuid_RX);
+   characteristicCache = characteristic
    debug1.innerHTML = '---------- await service.getCharacteristic ------'
  
    console.log('the requested device name is ' + device.name);
@@ -71,10 +78,8 @@ async function findHWCS_original() {
    
    console.log('is the HWCCS connected ? '+HWCCSConnected)
    debug1.innerHTML = 'connected to  '+HWCCSConnected
-     } catch(error) {
-    console.log('' + error);
-    debug2.innerHTML = 'The ERROR detail is >>> >>> '+error
-  }
+   
+   characteristicCache.addEventListener('characteristicvaluechanged',resultFromRead);   
   	//connected do cleanup
    cleanupBLEComs()
  

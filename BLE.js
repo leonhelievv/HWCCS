@@ -94,6 +94,7 @@ function getResponse() {
 	console.log('get respons timer fired - get the response - wait for read');
 	txMitterFree = false;
 	characteristicCache.readValue();
+	
 };
 
 function resultFromRead(event) {
@@ -272,8 +273,8 @@ function requestBluetoothDevice() {
   console.log('Requesting bluetooth device...');
   
   return navigator.bluetooth.requestDevice({  
-   filters: [{services: [service_uuid]}],
-   //acceptAllDevices: true
+   filters: [{services: [service_uuid]}]
+   //optionalServices: [service_uuid]  
   }).
       then(device => {
         console.log('"' + device.name + '" bluetooth device selected');
@@ -363,5 +364,3 @@ function sendUpdateToHWC() {
 	
 	
 }
-	
-	
