@@ -56,10 +56,10 @@ async function findHWCS_original() {
  	//device = await navigator.bluetooth.requestDevice({acceptAllDevices: true });
  	
  	device = await navigator.bluetooth.requestDevice({
-  		filters: [ {services: [service_uuid]} ],
+  		filters: [ {"name": "HLDevice"} ],
   		optionalServices: [service_uuid]
 	});
- 	
+	 	
  	debug1.innerHTML = '------await navigator.bluetooth.requestDevice-----'
    HWCCS_Server = await device.gatt.connect(service_uuid);
    debug1.innerHTML = '-------await device.gatt.connect------'
@@ -79,7 +79,9 @@ async function findHWCS_original() {
    console.log('is the HWCCS connected ? '+HWCCSConnected)
    debug1.innerHTML = 'connected to  '+HWCCSConnected
    
-   characteristicCache.addEventListener('characteristicvaluechanged',resultFromRead);   
+   characteristicCache.addEventListener('characteristicvaluechanged',resultFromRead);
+   
+   startNotifications(characteristic)
   	//connected do cleanup
    cleanupBLEComs()
  
