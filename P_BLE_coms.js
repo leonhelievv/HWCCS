@@ -81,7 +81,6 @@ async function findHWCS_original() {
    
    characteristicCache.addEventListener('characteristicvaluechanged',resultFromRead);
    
-   startNotifications(characteristic)
   	//connected do cleanup
    cleanupBLEComs()
  
